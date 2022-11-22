@@ -4,13 +4,17 @@
 using namespace std;
 
 namespace scudb {
-    template <typename K, typename V>
-    ExtendibleHash<K, V>::ExtendibleHash(size_t size) : global_depth(0), bucket_size(size), bucket_num(1) {
-        buckets.push_back(make_shared<Bucket>(0));
-    }
+     template <typename K, typename V>
+     ExtendibleHash<K, V>::ExtendibleHash(size_t size) {
+     global_depth = 0;
+     bucket_size = size;
+     bucket_number = 1;
+     buckets.push_back(make_shared<Bucket>(0));
+     }
+    
     template<typename K, typename V>
     ExtendibleHash<K, V>::ExtendibleHash() {
-        ExtendibleHash(64);     //固定每个桶的数组大小
+    ExtendibleHash(64);   //固定每个桶的数组大小
     }
 
     template <typename K, typename V>
@@ -25,13 +29,9 @@ namespace scudb {
     }
 
     template <typename K, typename V>
-    int ExtendibleHash<K, V>::GetLocalDepth(int bucket_id) const {
-        if (buckets[bucket_id]) {
-            lock_guard<mutex> lck(buckets[bucket_id]->latch);
-            if (buckets[bucket_id]->kmap.size() == 0) return -1;
-            return buckets[bucket_id]->local_depth;     //返回该桶的局部深度
-        }
-        return -1;
+    int ExtendibleHash<K, V>::GetGlobalDepth() const {
+    lock_guard<mutex> lock(latch_table);
+        return global_depth;   //返回该桶的局部深度
     }
 
     template <typename K, typename V>
