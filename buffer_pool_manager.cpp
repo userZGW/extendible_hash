@@ -33,6 +33,7 @@ namespace scudb {
      */
     Page* BufferPoolManager::FetchPage(page_id_t page_id) {
         lock_guard<mutex> lck(latch_);
+        
         Page* tar = nullptr;
         if (page_table_->Find(page_id, tar)) { //1.1
             tar->pin_count_++;
@@ -85,6 +86,7 @@ namespace scudb {
      */
     bool BufferPoolManager::FlushPage(page_id_t page_id) {
         lock_guard<mutex> lck(latch_);
+       
         Page* tar = nullptr;
         page_table_->Find(page_id, tar);
         if (tar == nullptr || tar->page_id_ == INVALID_PAGE_ID) {
@@ -106,7 +108,9 @@ namespace scudb {
      */
     bool BufferPoolManager::DeletePage(page_id_t page_id) {
         lock_guard<mutex> lck(latch_);
+        
         Page* tar = nullptr;
+        
         page_table_->Find(page_id, tar);
         if (tar != nullptr) {
             if (tar->GetPinCount() > 0) {
